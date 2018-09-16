@@ -6,28 +6,11 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/08 13:50:23 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/16 19:41:46 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 20:12:20 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
-
-static char	only_number(char *str)
-{
-	size_t	count;
-
-	count = 0;
-	while (*str && count < 6 && ft_isdigit(*str))
-	{
-		++count;
-		++str;
-	}
-	if (count < 4 || count > 5)
-		return (0);
-	if (!*str)
-		return (1);
-	return (0);
-}
 
 void		connect_server(t_client *client)
 {
@@ -56,6 +39,25 @@ void		connect_server(t_client *client)
 	}
 }
 
+static char	get_port(t_client *client, char *arg)
+{
+	int		tmp;
+
+	if (!arg)
+		client->port = htons(DEF_PORT);
+	else if (arg)
+	{
+		if (!(tmp = ft_atoi(arg)))
+		{
+			connect_usage();
+			free(arg);
+			return (1);
+		}
+		client->port = htons(tmp);
+	}
+	return (0);
+}
+
 void		manage_connect(char *str, t_client *client)
 {
 	char			*arg;
@@ -68,19 +70,17 @@ void		manage_connect(char *str, t_client *client)
 		return ;
 	}
 	clear_client(client);
-	inet_aton(arg, &addr);
+	if (!inet_aton(arg, &addr))
+	{
+		connect_usage();
+		free(arg);
+		return ;
+	}
 	client->address = addr.s_addr;
 	free(arg);
 	arg = get_next_word(&str);
-	if (!arg)
-		client->port = htons(DEF_PORT);
-	if (arg && !only_number(arg))
-	{
-		connect_usage();
+	if (get_port(client, arg))
 		return ;
-	}
-	else if (arg)
-		client->port = htons(ft_atoi(arg));
 	arg ? free(arg) : NULL;
 	connect_server(client);
 }
