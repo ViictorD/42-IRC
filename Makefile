@@ -24,9 +24,24 @@ SRC_DIR_CLI = ./srcs/client/
 
 FILES = main.c \
 			core_loop.c \
-			manage_users.c
+			manage_users.c \
+			create_cmd.c \
+			manage_recv_cmd.c \
+			manage_nick.c \
+			manage_reply.c \
+			manage_who.c \
+			manage_chan.c \
+			manage_join.c \
+			manage_leave.c \
+			manage_msg.c
 
-FILES_CLIENT = main.c
+FILES_CLIENT = main.c \
+				core_loop.c \
+				manage_connect.c \
+				print.c \
+				print_msg.c \
+				server_cmd.c \
+				data_transfert.c \
 
 SRCS = $(addprefix $(SRC_DIR), $(FILES))
 
@@ -43,11 +58,10 @@ DEP_OBJ = src_msg \
 RM = /bin/rm -rf
 
 all: mkdirobj $(DEP_OBJ)
-		@ ls ./obj/client/
 		@ make -C $(DIR_LIB)
 		@ /bin/echo -n "Archiving object in $(NAME_SERV):"
-		@ $(CC) -o $(NAME_CLIENT) $(OBJS_CLIENT) $(MFLAGS) -L $(DIR_LIB) -fsanitize=address
-		@ $(CC) -o $(NAME_SERV) $(OBJS) $(MFLAGS) -L $(DIR_LIB) -fsanitize=address
+		@ $(CC) -o $(NAME_CLIENT) $(OBJS_CLIENT) $(DIR_OBJ_SERVER)create_cmd.o $(MFLAGS) -L $(DIR_LIB) #-fsanitize=address
+		@ $(CC) -o $(NAME_SERV) $(OBJS) $(MFLAGS) -L $(DIR_LIB) #-fsanitize=address
 		@ echo " \033[32mAll done!\033[0m"
 
 $(DIR_OBJ_SERVER)%.o: $(SRC_DIR)%.c
@@ -55,7 +69,7 @@ $(DIR_OBJ_SERVER)%.o: $(SRC_DIR)%.c
 	@ $(CC) $(CFLAGS) -c -o $@ $< -I $(INCLUDE_DIR)
 	@ echo " \033[32mOK\033[0m"
 
-$(DIR_OBJ_CLIENT)%.o: $(SRC_CLIENT)%.c
+$(DIR_OBJ_CLIENT)%.o: $(SRC_DIR_CLI)%.c
 	@ /bin/echo -n "    $(notdir $@)"
 	@ $(CC) $(CFLAGS) -c -o $@ $< -I $(INCLUDE_DIR)
 	@ echo " \033[32mOK\033[0m"

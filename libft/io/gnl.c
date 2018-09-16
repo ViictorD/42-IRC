@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gnl.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bdurst <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/05/27 12:32:55 by bdurst            #+#    #+#             */
-/*   Updated: 2016/05/27 12:32:55 by bdurst           ###   ########.fr       */
+/*   Updated: 2018/09/09 13:48:04 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,16 @@ static char		*gnl_get_line(char *str, char **line, int *clean)
 int				gnl(int const fd, char **line)
 {
 	static char		*stock = NULL;
-	char			buff[BUFF_SIZE + 1];
+	char			buff[BUFFER_SIZE + 1];
 	char			*tmp;
 	int				ret;
 	int				clean;
 
 	clean = 0;
-	if (fd < 0 || !line || BUFF_SIZE < 1)
+	if (fd < 0 || !line || BUFFER_SIZE < 1)
 		return (-1);
-	ret = BUFF_SIZE;
-	while (!(ft_strchr(stock, '\n')) && (ret = read(fd, buff, BUFF_SIZE)) > 0)
+	ret = BUFFER_SIZE;
+	while (!(ft_strchr(stock, '\n')) && (ret = read(fd, buff, BUFFER_SIZE)) > 0)
 	{
 		buff[ret] = '\0';
 		tmp = stock;

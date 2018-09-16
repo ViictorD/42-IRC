@@ -10,6 +10,23 @@
 		"ratio": "cpp",
 		"tuple": "cpp",
 		"type_traits": "cpp",
-		"utility": "cpp"
+		"utility": "cpp",
+		"string.h": "c",
+		"__locale": "c",
+		"bitset": "c",
+		"algorithm": "c",
+		"initializer_list": "c",
+		"iterator": "c",
+		"list": "c",
+		"string": "c",
+		"string_view": "c",
+		"istream": "c",
+		"locale": "c",
+		"__mutex_base": "c",
+		"mutex": "c",
+		"system_error": "c",
+		"__bit_reference": "c",
+		"__functional_03": "c",
+		"typeinfo": "c"
 	}
 }

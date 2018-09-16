@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/13 19:47:25 by bdurst            #+#    #+#             */
-/*   Updated: 2017/10/11 13:37:37 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/14 14:42:46 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,7 @@ int					ft_strfind_by_end(const char *s, int c);
 int					ft_strfind(const char *s, int start, int c);
 char				ft_strcont(char *s1, char *s2);
 size_t				ft_counttab(char **tabu);
+size_t				irc_strlen(char *str);
+void				ft_str_toupper(char *dest, char *src, size_t size);
 
 #endif

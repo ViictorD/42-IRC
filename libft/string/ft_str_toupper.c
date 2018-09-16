@@ -1,23 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   ft_str_toupper.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/05/27 12:32:58 by bdurst            #+#    #+#             */
-/*   Updated: 2018/09/14 14:43:58 by vdarmaya         ###   ########.fr       */
+/*   Created: 2018/09/09 15:30:26 by vdarmaya          #+#    #+#             */
+/*   Updated: 2018/09/10 15:44:00 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "string.h"
+#include "ascii.h"
 
-size_t	ft_strlen(const char *str)
+void	ft_str_toupper(char *dest, char *src, size_t size)
 {
-	char		*tmp;
-
-	tmp = (char*)str;
-	while (*tmp)
-		++tmp;
-	return (tmp - str);
+	while (*src && size > 0)
+	{
+		*dest = ft_toupper(*src);
+		++src;
+		++dest;
+		--size;
+	}
 }

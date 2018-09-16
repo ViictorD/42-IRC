@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/03 13:04:47 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/04 18:36:00 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/13 15:20:17 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ static void	create_server(t_server *server, int port)
 void	clean_fd(t_fd *fd)
 {
 	fd->type = FD_FREE;
-	ft_bzero(fd->buff_read, BUF_SIZE + 1);
-	ft_bzero(fd->buff_write, BUF_SIZE + 1);
+	ft_bzero(fd->buff_read, BUFF_SIZE);
+	ft_bzero(fd->buff_write, BUFF_SIZE);
+	ft_bzero(fd->username, 10);
 }
 
 static void	init_struct(t_server *server)
@@ -52,6 +53,7 @@ static void	init_struct(t_server *server)
 	i = -1;
 	while (++i < server->max_fd)
 		clean_fd(&server->fds[i]);
+	server->chan = NULL;
 }
 
 int			main(int argc, char **argv)

@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   data_transfert.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/05/27 12:32:58 by bdurst            #+#    #+#             */
-/*   Updated: 2018/09/14 14:43:58 by vdarmaya         ###   ########.fr       */
+/*   Created: 2018/09/08 19:34:35 by vdarmaya          #+#    #+#             */
+/*   Updated: 2018/09/13 17:00:16 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "string.h"
+#include "irc.h"
 
-size_t	ft_strlen(const char *str)
+void	server_send(t_client *client)
 {
-	char		*tmp;
+	int		ret;
 
-	tmp = (char*)str;
-	while (*tmp)
-		++tmp;
-	return (tmp - str);
+	ret = send(client->fd, client->buff_write, irc_strlen(client->buff_write), 0);
+	// ft_putstr("SENT: \"");
+	// ft_putstr(client->buff_write);
+	// ft_putstr("\"\n");
+	if (ret < 0)
+		lost_connection(client);
+	else
+		ft_bzero(client->buff_write, BUFF_SIZE);
 }

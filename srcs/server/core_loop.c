@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/04 15:58:45 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/04 17:18:26 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/13 15:56:10 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,12 @@ void		server_loop(t_server *server)
 	int		max;
 	int		ret;
 
-	while (42)
+	while (1)
 	{
 		reset_fd(server, &max);
+		ft_putstr("lock\n");
 		ret = select(max + 1, &server->fd_read, &server->fd_write, NULL, NULL);
+		ft_putstr("lockout\n");
 		check_fds(server, ret);
 	}
 }
