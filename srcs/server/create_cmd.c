@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/08 20:12:08 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/11 18:04:23 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 18:57:44 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*get_next_word(char **str)
 	return (out);
 }
 
-char		*pass_whitespace(char *msg)
+char	*pass_whitespace(char *msg)
 {
 	while (*msg == ' ' || *msg == '\t' || *msg == '\n' || *msg == '\v' \
 			|| *msg == '\r' || *msg == '\f')

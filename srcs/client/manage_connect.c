@@ -6,13 +6,30 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/08 13:50:23 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/08 16:26:54 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:41:46 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
 
-void	connect_server(t_client *client)
+static char	only_number(char *str)
+{
+	size_t	count;
+
+	count = 0;
+	while (*str && count < 6 && ft_isdigit(*str))
+	{
+		++count;
+		++str;
+	}
+	if (count < 4 || count > 5)
+		return (0);
+	if (!*str)
+		return (1);
+	return (0);
+}
+
+void		connect_server(t_client *client)
 {
 	struct protoent		*pe;
 	struct sockaddr_in	addr;
@@ -39,27 +56,10 @@ void	connect_server(t_client *client)
 	}
 }
 
-static char	only_number(char *str)
+void		manage_connect(char *str, t_client *client)
 {
-	size_t	count;
-
-	count = 0;
-	while (*str && count < 6 && ft_isdigit(*str))
-	{
-		++count;
-		++str;
-	}
-	if (count < 4 || count > 5)
-		return (0);
-	if (!*str)
-		return (1);
-	return (0);
-}
-
-void	manage_connect(char *str, t_client *client)
-{
-	char	*arg;
-	struct in_addr addr;
+	char			*arg;
+	struct in_addr	addr;
 
 	arg = get_next_word(&str);
 	if (!arg)

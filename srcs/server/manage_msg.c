@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/11 15:56:01 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/14 16:46:25 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:21:41 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,11 @@ static void	send_to_channel(t_server *server, int fd, char *target, char *msg)
 	t_chan	*chan;
 	char	sharp;
 	size_t	i;
+	char	tmp[19];
 
 	sharp = *target == '#' ? 1 : 0;
 	chan = server->chan;
+	ft_strcpy(tmp, "CHANMSG ");
 	while (chan)
 	{
 		if (!ft_strcmp(chan->chan_name, target + sharp))
@@ -27,8 +29,9 @@ static void	send_to_channel(t_server *server, int fd, char *target, char *msg)
 			i = 0;
 			while (i < chan->count)
 			{
-				create_cmd3(server->fds[chan->connected[i]].buff_write, \
-					"CHANMSG", server->fds[fd].username, msg);
+				ft_strcpy(tmp + 8, server->fds[fd].username);
+				ft_strcpy(tmp + 8 + ft_strlen(server->fds[fd].username), " \0");
+				create_server_resp(server, chan->connected[i], tmp, msg);
 				++i;
 			}
 		}
@@ -36,23 +39,10 @@ static void	send_to_channel(t_server *server, int fd, char *target, char *msg)
 	}
 }
 
-char	user_exist(t_server *server, char *name)
-{
-	int		i;
-
-	i = -1;
-	while (++i < server->max_fd)
-	{
-		if (server->fds[i].type == FD_CLIENT && \
-			!ft_strcmp(server->fds[i].username, name))
-			return (1);
-	}
-	return (0);
-}
-
 static void	send_to_user(t_server *server, int fd, char *target, char *msg)
 {
 	int		i;
+	char	tmp[19];
 
 	if (user_exist(server, target))
 	{
@@ -62,8 +52,10 @@ static void	send_to_user(t_server *server, int fd, char *target, char *msg)
 			if (server->fds[i].type == FD_CLIENT && \
 				!ft_strcmp(server->fds[i].username, target))
 			{
-				create_cmd3(server->fds[i].buff_write, "PRIVMSG", \
-					server->fds[fd].username, msg);
+				ft_strcpy(tmp, "PRIVMSG ");
+				ft_strcpy(tmp + 8, server->fds[fd].username);
+				ft_strcpy(tmp + 8 + ft_strlen(server->fds[fd].username), " \0");
+				create_server_resp(server, i, tmp, msg);
 				return ;
 			}
 		}
@@ -98,13 +90,26 @@ static char	in_channel(t_server *server, int fd, char *name)
 	return (0);
 }
 
-void		manage_msg(t_server *server, int fd)
+static void	manage_msg2(t_server *server, int fd, char *target, char *msg)
+{
+	if (chan_exist(server, target))
+	{
+		if (!in_channel(server, fd, target))
+			reply_code(server, fd, ERR_CANNOTSENDTOCHAN);
+		else
+			send_to_channel(server, fd, target, msg);
+	}
+	else
+		send_to_user(server, fd, target, msg);
+}
+
+void		manage_msg(t_server *server, int fd, char *cmd)
 {
 	char	*tmp;
 	char	*target;
 	char	*msg;
 
-	tmp = server->fds[fd].buff_read + 3;
+	tmp = cmd + 4;
 	target = get_next_word(&tmp);
 	if (!target)
 	{
@@ -118,14 +123,6 @@ void		manage_msg(t_server *server, int fd)
 		free(target);
 		return ;
 	}
-	if (chan_exist(server, target))
-	{
-		if (!in_channel(server, fd, target))
-			reply_code(server, fd, ERR_CANNOTSENDTOCHAN);
-		else
-			send_to_channel(server, fd, target, msg);
-	}
-	else
-		send_to_user(server, fd, target, msg);
+	manage_msg2(server, fd, target, msg);
 	free(target);
 }

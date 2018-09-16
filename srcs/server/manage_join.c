@@ -6,11 +6,45 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/10 17:50:21 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/14 16:46:36 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:07:13 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
+
+static void	join_chan(t_server *server, int fd, char *name)
+{
+	t_chan	*chan;
+	char	sharp;
+
+	sharp = *name == '#' ? 1 : 0;
+	chan = server->chan;
+	while (chan)
+	{
+		if (!ft_strcmp(chan->chan_name, name + sharp))
+		{
+			chan->connected[chan->count] = fd;
+			++chan->count;
+			notif_users(server, fd, chan, 1);
+			return ;
+		}
+		NEXT(chan);
+	}
+}
+
+static void	manage_join2(t_server *server, int fd, char *name)
+{
+	char	*curr_chan;
+
+	if ((curr_chan = already_in_chan(server, fd)))
+		leave_chan(server, fd, curr_chan);
+	if (!chan_exist(server, name))
+		create_chan(server, name);
+	join_chan(server, fd, name);
+	ft_putstr("User #");
+	ft_putnbr(fd);
+	print_sentence2(" has join the channel: ", name);
+}
 
 void		notif_users(t_server *server, int fd, t_chan *chan, char is_join)
 {
@@ -36,26 +70,6 @@ void		notif_users(t_server *server, int fd, t_chan *chan, char is_join)
 	}
 }
 
-static void		join_chan(t_server *server, int fd, char *name)
-{
-	t_chan	*chan;
-	char	sharp;
-
-	sharp = *name == '#' ? 1 : 0;
-	chan = server->chan;
-	while (chan)
-	{
-		if (!ft_strcmp(chan->chan_name, name + sharp))
-		{
-			chan->connected[chan->count] = fd;
-			++chan->count;
-			notif_users(server, fd, chan, 1);
-			return ;
-		}
-		NEXT(chan);
-	}
-}
-
 char		*already_in_chan(t_server *server, int fd)
 {
 	size_t	i;
@@ -76,13 +90,12 @@ char		*already_in_chan(t_server *server, int fd)
 	return (NULL);
 }
 
-void		manage_join(t_server *server, int fd)
+void		manage_join(t_server *server, int fd, char *cmd)
 {
 	char	*tmp;
 	char	*name;
-	char	*curr_chan;
 
-	tmp = server->fds[fd].buff_read + 4;
+	tmp = cmd + 5;
 	name = get_next_word(&tmp);
 	if (!name)
 	{
@@ -98,17 +111,6 @@ void		manage_join(t_server *server, int fd)
 	else if (user_exist(server, name))
 		reply_code(server, fd, ERR_NICKCOLLISION);
 	else
-	{
-		if ((curr_chan = already_in_chan(server, fd)))
-			leave_chan(server, fd, curr_chan);
-		if (!chan_exist(server, name))
-			create_chan(server, name);
-		join_chan(server, fd, name);
-		ft_putstr("User #");
-		ft_putnbr(fd);
-		ft_putstr(" has join the channel: ");
-		ft_putstr(name);
-		ft_putstr("\n");
-	}
+		manage_join2(server, fd, name);
 	free(name);
 }

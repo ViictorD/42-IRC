@@ -6,13 +6,13 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/09 15:46:36 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/14 16:48:15 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:30:11 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
 
-static char		user_already_exist(t_server *server, int fd, char *nick)
+static char	user_already_exist(t_server *server, int fd, char *nick)
 {
 	int		i;
 
@@ -26,12 +26,12 @@ static char		user_already_exist(t_server *server, int fd, char *nick)
 	return (0);
 }
 
-void		manage_nick(t_server *server, int fd)
+void		manage_nick(t_server *server, int fd, char *cmd)
 {
 	char	*tmp;
 	char	*word;
 
-	tmp = server->fds[fd].buff_read + 4;
+	tmp = cmd + 5;
 	word = get_next_word(&tmp);
 	if (!word)
 	{
@@ -46,6 +46,9 @@ void		manage_nick(t_server *server, int fd)
 	{
 		ft_strcpy(server->fds[fd].username, word);
 		reply_code(server, fd, RPL_OK);
+		ft_putstr("User #");
+		ft_putnbr(fd);
+		print_sentence3(" change his nick for \"", word, "\"");
 	}
 	free(word);
 }

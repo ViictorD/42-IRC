@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/08 13:44:19 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/13 18:42:13 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:42:59 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	print_help(void)
 	ft_putstr("  - /connect <machine> [port]\n");
 	ft_putstr("  - /join <#chan>\n");
 	ft_putstr("  - /leave [#chan]\n");
-	ft_putstr("  - /msg <nick> <message>\n");
+	ft_putstr("  - /msg <nick>/<#chan> <message>\n");
 	ft_putstr("  - /nick <nick>\n");
 	ft_putstr("  - /who\n\n");
 }

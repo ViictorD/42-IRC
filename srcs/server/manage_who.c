@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/09 16:08:18 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/13 17:04:19 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:35:23 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static t_chan	*in_all_chan(t_server *server, int fd)
 	return (NULL);
 }
 
-void		manage_who(t_server *server, int fd)
+void			manage_who(t_server *server, int fd)
 {
 	char	users[BUFF_SIZE - 4];
 	size_t	i;
@@ -49,15 +49,14 @@ void		manage_who(t_server *server, int fd)
 	i = 0;
 	while (i < chan->count)
 	{
-		if (count + ft_strlen(server->fds[chan->connected[i]].username) > BUFF_SIZE - 4)
+		if (count + ft_strlen(server->fds[chan->connected[i]].username) > \
+			BUFF_SIZE - 4)
 			break ;
 		ft_strcpy(users + count, server->fds[chan->connected[i]].username);
 		count += ft_strlen(server->fds[chan->connected[i]].username);
-		ft_strcpy(users + count, " ");
-		++count;
+		ft_strcpy(users + count++, " ");
 		++i;
 	}
-
 	users[count] = '\0';
 	reply_code_arg(server, fd, RPL_WHOREPLY, users);
 }

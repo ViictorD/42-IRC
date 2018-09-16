@@ -6,15 +6,18 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/16 13:17:42 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/16 13:21:17 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:33:41 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "irc.h"
 
 void	user_left(t_server *server, int fd)
 {
+	char	*chan;
+
+	if ((chan = already_in_chan(server, fd)))
+		leave_chan(server, fd, chan);
 	close(fd);
 	clean_fd(&server->fds[fd]);
 	ft_putstr("Client #");
@@ -42,32 +45,37 @@ void	create_new_user(t_server *server, int s)
 	ft_putnbr(ntohs(addr.sin_port));
 	ft_putstr("\"\n");
 	clean_fd(&server->fds[new_fd]);
+	if (new_fd < 10)
+	{
+		ft_strcpy(server->fds[new_fd].username, "vdarmaya");
+		server->fds[new_fd].username[8] = new_fd + 48;
+	}
 	server->fds[new_fd].type = FD_CLIENT;
 }
 
-void	user_recv(t_server *server, int s)
+void	save_read(t_server *server, int fd, int ret)
 {
-	int		ret;
-	// int		i;
+	char	*tmp;
+	size_t	len;
 
-	// gerer si + grand que BUFF_SIZE
-	ret = recv(s, server->fds[s].buff_read, BUFF_SIZE, 0);
-	if (ret <= 0)
-		user_left(server, s);
+	len = 0;
+	tmp = NULL;
+	if (!server->fds[fd].save_read)
+	{
+		if (!(server->fds[fd].save_read = (char*)malloc(ret + 1)))
+			ft_exiterror("Malloc failed", 1);
+	}
 	else
 	{
-		manage_recv_cmd(server, s);
-		ft_bzero(server->fds[s].buff_read, BUFF_SIZE + 1);
+		tmp = server->fds[fd].save_read;
+		len += ft_strlen(tmp);
+		if (!(server->fds[fd].save_read = (char*)malloc(len + ret + 1)))
+			ft_exiterror("Malloc failed", 1);
+		ft_strncpy(server->fds[fd].save_read, tmp, len);
 	}
-}
-
-void	user_send(t_server *server, int s)
-{
-	int		ret;
-
-	ret = send(s, server->fds[s].buff_write, ft_strlen(server->fds[s].buff_write), 0);
-	if (ret < 0)
-		user_left(server, s);
-	else
-		ft_bzero(server->fds[s].buff_write, BUFF_SIZE + 1);
+	ft_strncpy(server->fds[fd].save_read + len, server->fds[fd].buff_read, ret);
+	server->fds[fd].save_read[len + ret] = '\0';
+	if (tmp)
+		free(tmp);
+	ft_bzero(server->fds[fd].buff_read, BUFF_SIZE);
 }

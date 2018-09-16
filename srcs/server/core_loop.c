@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/04 15:58:45 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/13 15:56:10 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:07:52 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ static void	reset_fd(t_server *server, int *max)
 		{
 			FD_SET(i, &server->fd_read);
 			if (*(server->fds[i].buff_write) != 0)
+				FD_SET(i, &server->fd_write);
+			else if (server->fds[i].save_write)
 				FD_SET(i, &server->fd_write);
 			*max = (i > *max) ? i : *max;
 		}
@@ -63,9 +65,7 @@ void		server_loop(t_server *server)
 	while (1)
 	{
 		reset_fd(server, &max);
-		ft_putstr("lock\n");
 		ret = select(max + 1, &server->fd_read, &server->fd_write, NULL, NULL);
-		ft_putstr("lockout\n");
 		check_fds(server, ret);
 	}
 }

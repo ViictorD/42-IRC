@@ -1,27 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc_strlen.c                                       :+:      :+:    :+:   */
+/*   manage_leave2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/08 21:07:30 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/16 19:55:01 by vdarmaya         ###   ########.fr       */
+/*   Created: 2018/09/16 19:14:30 by vdarmaya          #+#    #+#             */
+/*   Updated: 2018/09/16 19:14:48 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "string.h"
+#include "irc.h"
 
-size_t		irc_strlen(char *str)
+void	reindex_connected(t_chan *chan, size_t i)
 {
-	char	*tmp;
-
-	tmp = str;
-	while (*str)
+	while (i < chan->count)
 	{
-		if (*str == '\r' && *(str + 1) == '\n')
-			return ((str - tmp) + 2);
-		++str;
+		chan->connected[i] = chan->connected[i + 1];
+		++i;
 	}
-	return (0);
+	chan->connected[i] = 0;
 }

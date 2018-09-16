@@ -6,7 +6,7 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/10 18:03:04 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/13 18:21:30 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:25:13 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_chan	*new_chan(t_server *server, char *name)
 {
-	t_chan 	*new;
+	t_chan	*new;
 
 	new = (t_chan*)malloc(sizeof(struct s_chan));
 	new->connected = (int*)malloc(sizeof(int) * server->max_fd);
@@ -22,15 +22,13 @@ static t_chan	*new_chan(t_server *server, char *name)
 	if (*name == '#')
 		++name;
 	ft_strcpy(new->chan_name, name);
-	ft_putstr("NEW CHAN \"");
-	ft_putstr(new->chan_name);
-	ft_putstr("\"\n");
+	print_sentence3("New channel \"", new->chan_name, "\"");
 	new->next = NULL;
 	new->count = 0;
 	return (new);
 }
 
-void		free_chan(t_chan *chan)
+void			free_chan(t_chan *chan)
 {
 	free(chan->connected);
 	if (chan->next)
@@ -38,9 +36,9 @@ void		free_chan(t_chan *chan)
 	free(chan);
 }
 
-void		delete_chan(t_server *server, t_chan *to_del)
+void			delete_chan(t_server *server, t_chan *to_del)
 {
-	t_chan 	*prev;
+	t_chan	*prev;
 	t_chan	*curr;
 
 	curr = server->chan;
@@ -49,9 +47,7 @@ void		delete_chan(t_server *server, t_chan *to_del)
 	{
 		if (curr == to_del)
 		{
-			ft_putstr("Chan ");
-			ft_putstr(curr->chan_name);
-			ft_putstr(" deleted\n");
+			print_sentence3("Chan ", curr->chan_name, " deleted");
 			if (prev == curr)
 			{
 				server->chan = !curr->next ? NULL : curr->next;
@@ -69,7 +65,7 @@ void		delete_chan(t_server *server, t_chan *to_del)
 	}
 }
 
-void		create_chan(t_server *server, char *name)
+void			create_chan(t_server *server, char *name)
 {
 	t_chan		*chan;
 
@@ -84,7 +80,7 @@ void		create_chan(t_server *server, char *name)
 	}
 }
 
-char		chan_exist(t_server *server, char *name)
+char			chan_exist(t_server *server, char *name)
 {
 	t_chan		*chan;
 	char		sharp;

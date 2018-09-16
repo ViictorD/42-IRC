@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   irc_strlen.c                                       :+:      :+:    :+:   */
+/*   print_sentenc.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/08 21:07:30 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/16 19:55:01 by vdarmaya         ###   ########.fr       */
+/*   Created: 2018/09/16 18:59:26 by vdarmaya          #+#    #+#             */
+/*   Updated: 2018/09/16 19:01:44 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "string.h"
+#include "irc.h"
 
-size_t		irc_strlen(char *str)
+void	print_sentence2(char *str1, char *str2)
 {
-	char	*tmp;
+	ft_putstr(str1);
+	ft_putstr(str2);
+	ft_putchar('\n');
+}
 
-	tmp = str;
-	while (*str)
-	{
-		if (*str == '\r' && *(str + 1) == '\n')
-			return ((str - tmp) + 2);
-		++str;
-	}
-	return (0);
+void	print_sentence3(char *str1, char *str2, char *str3)
+{
+	ft_putstr(str1);
+	ft_putstr(str2);
+	ft_putstr(str3);
+	ft_putchar('\n');
 }

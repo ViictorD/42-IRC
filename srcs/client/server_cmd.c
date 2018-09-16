@@ -6,79 +6,98 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/08 19:11:31 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/14 15:59:28 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:51:03 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
 
-void			lost_connection(t_client *client)
+static char	check_cmd(char *str, char *cmp)
+{
+	size_t	size;
+
+	size = ft_strlen(cmp);
+	if (*str == '/' && !ft_strncmp(str + 1, cmp, size) && \
+		(*(str + 1 + size) == ' ' || *(str + 1 + size) == '\0'))
+		return (1);
+	return (0);
+}
+
+char		check_valid_cmd(int i, char *str)
+{
+	if (!i || i == 1)
+	{
+		!i ? ft_putchar('\n') : 0;
+		return (1);
+	}
+	if (i == CMD_BUFF)
+	{
+		ft_fputstr("irc: command too long\n", 2);
+		while (str[0] != 10)
+			read(0, str, 1);
+		return (1);
+	}
+	return (0);
+}
+
+void		manage_cmd(t_client *client)
+{
+	char	str[CMD_BUFF];
+	int		i;
+
+	i = read(0, str, CMD_BUFF);
+	if (check_valid_cmd(i, str))
+		return ;
+	str[i - 1] = '\0';
+	if (check_cmd(str, "nick") || check_cmd(str, "join") || \
+		check_cmd(str, "who") || check_cmd(str, "msg") || \
+		check_cmd(str, "leave"))
+	{
+		if (!client->fd)
+			ft_fputstr("Not connected to a server\n", 2);
+		else
+			create_cmd1(client->buff_write, str);
+	}
+	else
+	{
+		if (!ft_strncmp(str + 1, "connect", 7))
+			manage_connect(str + 8, client);
+		else if (!ft_strcmp(str + 1, "help"))
+			print_help();
+		else
+			print_usage(str);
+	}
+}
+
+void		lost_connection(t_client *client)
 {
 	ft_putstr("\nLost connection with the server\n");
 	clear_client(client);
 }
 
-static	void	treat_number(t_client *client)
+void		save_read_client(t_client *client, int ret)
 {
-	int		num_msg;
-	char	num[4];
+	char	*tmp;
+	size_t	len;
 
-	ft_strncpy(num, client->buff_read, 3);
-	num[3] = 0;
-	num_msg = ft_atoi(num);
-	PRINT_REPLY(num_msg, 0, "Fail to get the packet id\n");
-	PRINT_REPLY(num_msg, ERR_NONICKNAMEGIVEN, "No nickname given\n");
-	PRINT_REPLY(num_msg, ERR_UNAVAILRESOURCE, "Invalid size\n");
-	PRINT_REPLY(num_msg, ERR_NICKCOLLISION, "Nickname already exist\n");
-	PRINT_REPLY(num_msg, ERR_NOSUCHNICK, "User not found\n");
-	PRINT_REPLY(num_msg, ERR_NEEDMOREPARAMS, "Need more parameter\n");
-	PRINT_REPLY(num_msg, ERR_TOOMANYCHANNELS, "Too many channels\n");
-	PRINT_REPLY(num_msg, ERR_NORECIPIENT, "No target\n");
-	PRINT_REPLY(num_msg, ERR_NOTEXTTOSEND, "No message to send\n");
-	PRINT_REPLY(num_msg, ERR_CANNOTSENDTOCHAN, "Can not send to this channel\n");
-	PRINT_REPLY(num_msg, ERR_NOSUCHSERVER, "Not in channel\n");
-	PRINT_REPLY(num_msg, ERR_NOTONCHANNEL, "Not in channel\n");
-	PRINT_REPLY(num_msg, ERR_NONICKSET, "Nickname not set !\n");
-	PRINT_REPLY(num_msg, RPL_TOPIC, "Successful connected to the channel !\n");
-	
-	client->prompt = num_msg == RPL_TOPIC ? 0 : 1;
-
-	num_msg == RPL_WHOREPLY ? print_who(client->buff_read + 3) : 0;
-	if (client->wait_data && num_msg)
-		client->wait_data = 0;
-}
-
-static	void	treat_string(t_client *client)
-{
-	if (!ft_strncmp(client->buff_read, "PRIVMSG", 7))
-		print_privmsg(client);
-	else if (!ft_strncmp(client->buff_read, "CHANMSG", 7))
-		print_chanmsg(client);
+	tmp = NULL;
+	len = 0;
+	if (!client->save_read)
+	{
+		if (!(client->save_read = (char*)malloc(ret + 1)))
+			ft_exiterror("Malloc failed", 1);
+	}
 	else
 	{
-		ft_putstr("irc: bad message received from the server: \"");
-		ft_putstr(client->buff_read);
-		ft_putstr("\"\n");
+		tmp = client->save_read;
+		len = ft_strlen(tmp);
+		if (!(client->save_read = (char*)malloc(len + ret + 1)))
+			ft_exiterror("Malloc failed", 1);
+		ft_strncpy(client->save_read, tmp, len);
 	}
-}
-
-void	server_recv(t_client *client)
-{
-	int		ret;
-
-	ret = recv(client->fd, client->buff_read, BUFF_SIZE, 0);
-	// ft_putstr("RECV: \"");
-	// ft_putstr(client->buff_read);
-	// ft_putstr("\"\n");
-	if (ret <= 0)
-	{
-		lost_connection(client);
-		return ;
-	}
-	if (ret > 2 && ft_isdigit(client->buff_read[0]) && \
-		ft_isdigit(client->buff_read[1]) && ft_isdigit(client->buff_read[2]))
-		treat_number(client);
-	else
-		treat_string(client);
+	ft_strncpy(client->save_read + len, client->buff_read, ret);
+	client->save_read[len + ret] = '\0';
+	if (tmp)
+		free(tmp);
 	ft_bzero(client->buff_read, BUFF_SIZE);
 }

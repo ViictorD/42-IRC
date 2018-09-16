@@ -6,20 +6,25 @@
 /*   By: vdarmaya <vdarmaya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/11 14:26:24 by vdarmaya          #+#    #+#             */
-/*   Updated: 2018/09/14 16:02:35 by vdarmaya         ###   ########.fr       */
+/*   Updated: 2018/09/16 19:14:41 by vdarmaya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.h"
 
-static void	reindex_connected(t_chan *chan, size_t i)
+static char	leave_chan2(t_server *server, int fd, size_t i, t_chan *chan)
 {
-	while (i < chan->count)
-	{
-		chan->connected[i] = chan->connected[i + 1];
-		++i;
-	}
+	ft_putstr("Removed user #");
+	ft_putnbr(fd);
+	print_sentence3(" from \"", chan->chan_name, "\"");
+	notif_users(server, fd, chan, 0);
 	chan->connected[i] = 0;
+	--chan->count;
+	if (!chan->count)
+		delete_chan(server, chan);
+	else if (i != chan->count)
+		reindex_connected(chan, i);
+	return (1);
 }
 
 void		leave_chan(t_server *server, int fd, char *name)
@@ -37,27 +42,14 @@ void		leave_chan(t_server *server, int fd, char *name)
 			i = 0;
 			while (i < chan->count)
 			{
-				if (chan->connected[i] == fd)
-				{
-					ft_putstr("Removed user #");
-					ft_putnbr(fd);
-					ft_putstr(" from \"");
-					ft_putstr(name);
-					ft_putstr("\"\n");
-					chan->connected[i] = 0;
-					--chan->count;
-					if (!chan->count)
-						delete_chan(server, chan);
-					else if (i != chan->count)
-						reindex_connected(chan, i);
+				if (chan->connected[i] == fd && \
+					leave_chan2(server, fd, i, chan))
 					return ;
-				}
 				++i;
 			}
 		}
 		NEXT(chan);
 	}
-	return ;
 }
 
 static char	leave_all(t_server *server, int fd)
@@ -73,7 +65,6 @@ static char	leave_all(t_server *server, int fd)
 		{
 			if (chan->connected[i] == fd)
 			{
-				notif_users(server, fd, chan, 0);
 				leave_chan(server, fd, chan->chan_name);
 				return (1);
 			}
@@ -109,11 +100,11 @@ static char	is_in_chan(t_server *server, int fd, char *name)
 	return (0);
 }
 
-void		manage_leave(t_server *server, int fd)
+void		manage_leave(t_server *server, int fd, char *cmd)
 {
 	char	*name;
 
-	name = server->fds[fd].buff_read + 5;
+	name = cmd + 6;
 	name = get_next_word(&name);
 	if (name)
 	{
