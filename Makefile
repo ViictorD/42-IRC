@@ -66,9 +66,9 @@ all: mkdirobj $(DEP_OBJ)
 		@ make -C $(DIR_LIB)
 		@ /bin/echo -n "Archiving object in $(NAME_SERV):"
 		@ echo " \033[32mAll done!\033[0m"
-		@ $(CC) -o $(NAME_CLIENT) $(OBJS_CLIENT) $(DIR_OBJ_SERVER)create_cmd.o $(MFLAGS) -L $(DIR_LIB) -fsanitize=address
+		@ $(CC) -o $(NAME_CLIENT) $(OBJS_CLIENT) $(DIR_OBJ_SERVER)create_cmd.o $(MFLAGS) -L $(DIR_LIB)
 		@ /bin/echo -n "Archiving object in $(NAME_CLIENT):"
-		@ $(CC) -o $(NAME_SERV) $(OBJS) $(MFLAGS) -L $(DIR_LIB) -fsanitize=address
+		@ $(CC) -o $(NAME_SERV) $(OBJS) $(MFLAGS) -L $(DIR_LIB)
 		@ echo " \033[32mAll done!\033[0m"
 
 $(DIR_OBJ_SERVER)%.o: $(SRC_DIR)%.c
